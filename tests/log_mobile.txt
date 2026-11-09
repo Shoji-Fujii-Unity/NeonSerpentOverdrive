@@ -1,0 +1,68 @@
+﻿=== boot ===
+NSO=object
+gsap=object confetti=function Tone=object
+state=menu ai=3 orbs=12
+canvas=504x731
+extRes=[]
+fontStatus=loaded orbitron=True chakra=True
+touchMode=False touchPadVisible=False
+menuBtn=ゲームスタート
+layout=#toolbar:[276,10,190x34] .hud-time:[422,52,42x34] #pulseMeter:[0,0,0x0] #pulseMeter i:[0,0,0x0] #pulseKey:[0,0,0x0] #comboWrap:[186,58,132x29] menuScroll=731/731
+SHOT 01_title
+=== run ===
+audioBackend=tone music=started
+SHOT 02_countdown
+stateAfterCount=playing
+SHOT 03a2_early
+SHOT 03a_play
+scoreSeq=66,66,71,79,102,198,198,261,261,340,dead:ai,dead:ai,dead:ai,dead:ai,dead:ai,dead:ai,dead:ai,dead:ai
+combo=3 orbs=10 len=26 state=over
+SHOT 03_play
+=== pulse ===
+  (restart run, was: over)
+pulseCount=1 waves=1 maxR=146 expectR=182
+SHOT 04_pulse_wave
+stunnedAI=1
+SHOT 05_pulse_stun
+touchDoubleTap pulses 1 -> 2
+=== powerups ===
+buffs=👻 無敵 3🧲 吸引 6✦ 倍取り 6⚡ 加速
+timeNow=54.6 speed=4.5 powersLeft=3
+SHOT 05_buffs
+=== kill (AI head into player body) ===
+  placed: ai#8->220,224 playerAlive=true
+kills 1 -> 2 score=1414 aiAlive=2
+aiRespawned=3
+SHOT 06_kill
+=== pause / resume ===
+pausePanel=True state=paused
+SHOT 07_pause
+afterEsc=playing
+=== rank up ===
+rankChip=A next=S toasts=ランクアップ！ A
+=== language ===
+SHOT 08_lang
+en start=START GAME howto=7 settings=SETTINGS
+ko start=게임 시작 howto=7 settings=설정
+zh start=开始游戏 howto=7 settings=设置
+SHOT 09_lang_zh
+ja start=ゲームスタート
+=== settings ===
+SHOT 10_settings
+toLow=low
+toHigh=high
+fxSoft=False
+=== time up -> game over ===
+overPanel=True state=over
+stats=スコア1200最大コンボ×23撃破5オーブ40長さ109パルス2
+reason=60秒が過ぎた nextRank=次の B まで 600 ポイント
+savedScores=2
+SHOT 11_gameover
+=== menu attract ===
+state=menu menuAI=3 player=False aiAlive=3
+menuScoreRows=2
+SHOT 12_menu_attract
+fps~66.3
+pageErrs=[]
+cdpErrors=0
+BROWSER TEST: NO PAGE ERRORS

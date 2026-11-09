@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#06060f">
+<meta name="description" content="NEON SERPENT OVERDRIVE — ネオン風スネーク・アクションサバイバル（60秒スコアアタック）改良版">
+<title>NEON SERPENT OVERDRIVE</title>
+<link rel="stylesheet" href="vendor/fonts/fonts.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<canvas id="stage"></canvas>
+<div id="crt" aria-hidden="true"></div>
+<div id="vignette" aria-hidden="true"></div>
+<div id="danger" aria-hidden="true"></div>
+
+<!-- ============ HUD ============ -->
+<div id="hud" aria-hidden="true">
+  <div class="hud-col hud-left">
+    <div class="hud-cell hud-score">
+      <span class="lbl" data-i18n="score">SCORE</span>
+      <span class="val" id="vScore">0</span>
+    </div>
+    <div class="hud-cell hud-rank">
+      <span class="rank-chip" id="rankChip">D</span>
+      <span class="rank-bar"><i id="rankFill"></i></span>
+      <span class="rank-next" id="rankNext">C</span>
+    </div>
+  </div>
+
+  <div class="hud-col hud-center">
+    <div id="comboWrap">
+      <div id="comboText">COMBO</div>
+      <div class="combo-bar"><i id="comboFill"></i></div>
+    </div>
+  </div>
+
+  <div class="hud-col hud-right">
+    <div class="hud-cell hud-time">
+      <span class="lbl" data-i18n="time">TIME</span>
+      <span class="val" id="vTime">60</span>
+    </div>
+    <div class="hud-mini">
+      <span title="length">LEN <b id="vLen">6</b></span>
+      <span title="kills">KO <b id="vKills">0</b></span>
+      <span title="lives" id="livesWrap">LIFE <b id="vLives">0</b></span>
+    </div>
+  </div>
+
+  <div id="buffs"></div>
+</div>
+
+<div id="pulseMeter"><i id="pulseFill"></i><span id="pulseKey">SPACE</span></div>
+
+<!-- ============ top-right toolbar ============ -->
+<div id="toolbar">
+  <button class="icon-btn active" id="btnSfx" title="SFX">🔊</button>
+  <button class="icon-btn active" id="btnMusic" title="MUSIC">🎵</button>
+  <button class="icon-btn" id="btnSettings" title="SETTINGS">⚙</button>
+  <button class="icon-btn" id="btnLang" title="LANGUAGE">🌐</button>
+  <button class="icon-btn" id="btnPause" title="PAUSE">❚❚</button>
+</div>
+
+<!-- ============ countdown ============ -->
+<div id="countdown"><span id="countNum">3</span></div>
+
+<!-- ============ toasts ============ -->
+<div id="toastWrap"></div>
+
+<!-- ============ MENU ============ -->
+<div class="panel" id="menu">
+  <div class="logo">
+    <div class="logo-main" id="logoMain">NEON&nbsp;SERPENT</div>
+    <div class="logo-sub" id="logoSub">OVERDRIVE</div>
+  </div>
+  <p class="tagline" id="menuTag"></p>
+
+  <div class="diff-row" id="diffChips"></div>
+
+  <button class="btn btn-primary" id="btnStart"></button>
+
+  <div class="cols">
+    <div class="col">
+      <h3 data-i18n="highscores">HIGH SCORES</h3>
+      <div id="scoreList"></div>
+    </div>
+    <div class="col">
+      <h3 data-i18n="howto">HOW TO PLAY</h3>
+      <ul class="howto" id="howtoList"></ul>
+    </div>
+  </div>
+  <div class="foot" id="menuFoot"></div>
+</div>
+
+<!-- ============ PAUSE ============ -->
+<div class="panel hidden" id="pausePanel">
+  <h2 class="panel-title" id="pauseTitle">PAUSED</h2>
+  <p class="panel-sub" id="pauseSub"></p>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="btnResume"></button>
+    <button class="btn" id="btnRestart"></button>
+    <button class="btn btn-ghost" id="btnQuit"></button>
+  </div>
+  <p class="panel-foot" id="pauseFoot"></p>
+</div>
+
+<!-- ============ GAME OVER ============ -->
+<div class="panel hidden" id="overPanel">
+  <h2 class="panel-title over-title" id="overTitle">GAME OVER</h2>
+  <p class="panel-sub" id="overReason"></p>
+  <div class="big-score"><span id="overScore">0</span><em id="overRank">D</em></div>
+  <div id="newRecord" class="new-record hidden"></div>
+  <div class="stat-grid" id="overStats"></div>
+  <div class="next-rank" id="overNext"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="btnAgain"></button>
+    <button class="btn" id="btnMenu"></button>
+  </div>
+</div>
+
+<!-- ============ SETTINGS ============ -->
+<div class="panel hidden" id="settingsPanel">
+  <h2 class="panel-title" id="setTitle">SETTINGS</h2>
+  <div class="set-grid">
+    <label class="set-row"><span data-i18n="music">MUSIC</span>
+      <span class="set-ctl"><button class="tgl active" id="tgMusic"></button><input type="range" id="volMusic" min="0" max="100" value="55"></span></label>
+    <label class="set-row"><span data-i18n="sfx">SFX</span>
+      <span class="set-ctl"><button class="tgl active" id="tgSfx"></button><input type="range" id="volSfx" min="0" max="100" value="80"></span></label>
+    <div class="set-row"><span data-i18n="quality">GRAPHICS</span>
+      <span class="set-ctl seg" id="segQuality">
+        <button data-q="auto" class="active">AUTO</button><button data-q="high">HIGH</button><button data-q="low">LOW</button>
+      </span></div>
+    <div class="set-row"><span data-i18n="effects">EFFECTS</span>
+      <span class="set-ctl seg" id="segFx">
+        <button data-fx="full" class="active">FULL</button><button data-fx="soft">SOFT</button><button data-fx="off">OFF</button>
+      </span></div>
+    <div class="set-row"><span data-i18n="difficulty">DIFFICULTY</span>
+      <span class="set-ctl seg" id="segDiff"></span></div>
+    <div class="set-row"><span data-i18n="scores">SAVED SCORES</span>
+      <span class="set-ctl"><button class="btn btn-mini btn-danger" id="btnClearScores"></button></span></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="btnCloseSettings"></button>
+  </div>
+</div>
+
+<!-- ============ LANGUAGE ============ -->
+<div class="panel hidden" id="langPanel">
+  <h2 class="panel-title">🌐 LANGUAGE</h2>
+  <div class="lang-grid">
+    <button class="btn lang-btn" data-lang="ja">日本語</button>
+    <button class="btn lang-btn" data-lang="en">English</button>
+    <button class="btn lang-btn" data-lang="ko">한국어</button>
+    <button class="btn lang-btn" data-lang="zh">中文</button>
+  </div>
+  <div class="btn-row"><button class="btn" id="btnCloseLang"></button></div>
+</div>
+
+<!-- ============ touch controls ============ -->
+<div id="touchPad" class="hidden">
+  <button id="btnPulseTouch"><span id="pulseTouchLabel">PULSE</span><i id="pulseTouchRing"></i></button>
+  <div id="touchHint"></div>
+</div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/confetti.min.js"></script>
+<script src="vendor/tone.js"></script>
+
+<script src="js/i18n.js"></script>
+<script src="js/util.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/entities.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/render.js"></script>
+<script src="js/input.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
